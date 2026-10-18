@@ -31,3 +31,6 @@ mail-dumps/
 .idea/
 .vscode/
 .claude/settings.local.json
+
+# Personal notes (contain private deployment details)
+notes/
