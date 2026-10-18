@@ -5,6 +5,8 @@
     tuta-cowork-bridge check        configuration self-check; prints no secret values
     tuta-cowork-bridge live-check   logs in to Tuta and prints counts only (no mail content)
     tuta-cowork-bridge gen-api-key  create/rotate the MCP API key in the credential store
+    tuta-cowork-bridge totp-code    current 6-digit code from the stored TOTP seed (to confirm
+                                    a newly added second factor in Tuta)
 """
 
 from __future__ import annotations
@@ -167,7 +169,7 @@ async def _live_check(settings: Settings) -> int:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="tuta-cowork-bridge", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["serve", "stdio", "check", "live-check", "gen-api-key"])
+    parser.add_argument("command", choices=["serve", "stdio", "check", "live-check", "gen-api-key", "totp-code"])
     parser.add_argument("--version", action="version", version=__version__)
     args = parser.parse_args(argv)
 
@@ -186,6 +188,13 @@ def main(argv: list[str] | None = None) -> None:
             CredentialStore(settings).generate_api_key()
             print(f"API key stored ({settings.credential_backend}: {settings.keychain_service} / TCB_API_KEY). "
                   "Restart the service to use it.")
+        elif args.command == "totp-code":
+            from tuta.crypto import generate_totp
+
+            seed = CredentialStore(settings).get("TUTA_TOTP_SECRET")
+            if not seed:
+                raise CredentialError("no TUTA_TOTP_SECRET stored")
+            print(f"{generate_totp(seed):06d}  (valid for the current 30 s window)")
     except CredentialError as e:
         print(f"credential error: {e}", file=sys.stderr)
         sys.exit(2)
