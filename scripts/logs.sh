@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Shows recent service logs. Logs are already redacted (tokens, keys, email
 # addresses) and never contain mail subjects or bodies.
 #   scripts/logs.sh [lines]   |   scripts/logs.sh -f

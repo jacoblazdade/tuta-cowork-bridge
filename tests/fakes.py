@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """In-memory fake of the TutaClient surface, serving synthetic mail that is
 encrypted with tutaproxy's real AesCbcThenHmac code, so the upstream decrypt path
 is exercised end to end. Any method outside READ_METHODS trips an AssertionError

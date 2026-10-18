@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # headersHelper for Claude Code: prints {"X-API-Key": "..."} read from the Keychain at
 # connect time, so the key is never stored in Claude Code's config files.
 source "$(dirname "$0")/lib.sh"

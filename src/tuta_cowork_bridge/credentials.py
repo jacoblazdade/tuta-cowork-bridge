@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Secret storage: macOS Keychain (default) or a strictly-permissioned file.
 
 Item names (Keychain accounts / file keys):

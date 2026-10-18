@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Makes the pinned upstream checkouts importable and pins their safety switches.
 
 tutaproxy-public provides the `tuta` package (TutaClient, crypto) and

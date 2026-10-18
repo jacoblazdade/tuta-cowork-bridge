@@ -1,0 +1,18 @@
+name: Feature request
+description: Suggest a capability or improvement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Features that modify the mailbox must be opt-in and follow the ground rules in
+        ROADMAP.md (server-side limits, audit log, tests proving they are off by default).
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you want Claude to be able to do, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risks you see (e.g. what a malicious email could make Claude do with this)

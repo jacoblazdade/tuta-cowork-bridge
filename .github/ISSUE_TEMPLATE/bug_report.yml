@@ -1,0 +1,46 @@
+name: Bug report
+description: Something does not work as documented
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste email content, subjects, addresses, API keys, passwords, TOTP seeds,
+        access tokens, hostnames or unredacted logs.** This repository is public.
+        Security problems: use *Report a vulnerability* instead.
+  - type: input
+    id: version
+    attributes:
+      label: Bridge version
+      description: From `connector_status` or `tuta-cowork-bridge --version`
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Deployment
+      options: [macOS + launchd, Linux, Container, Other]
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      placeholder: Claude Cowork, Claude Code, ...
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines (already redacted by the bridge; check again before posting)
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed mail content, addresses, keys, tokens and hostnames from this report.
+          required: true

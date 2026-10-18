@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Command line entry point.
 
     tuta-cowork-bridge serve        Streamable HTTP on TCB_HOST:TCB_PORT (loopback only by default)

@@ -1,0 +1,19 @@
+# Update proposals arrive as pull requests and are never merged automatically.
+# Upgrades cannot add MCP tools: the tool allowlist lives in this repository.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+  # Upstream Tuta client code: review the diff (network calls, logging, crypto, telemetry)
+  # before merging, as described in CONTRIBUTING.md.
+  - package-ecosystem: gitsubmodule
+    directory: /
+    schedule:
+      interval: monthly

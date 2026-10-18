@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Read-only mailbox access with bounded scans.
 
 Every Tuta request made from this module is a read: GETs, plus the

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Health overview: launchd state, listener, authenticated MCP probe, Tailscale route.
 # Prints no secrets and no mail content.
 source "$(dirname "$0")/lib.sh"

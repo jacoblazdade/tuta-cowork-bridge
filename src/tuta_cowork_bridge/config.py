@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Non-secret runtime settings, read from TCB_* environment variables.
 
 Secrets (Tuta credentials, the MCP API key) never come from here; see credentials.py.

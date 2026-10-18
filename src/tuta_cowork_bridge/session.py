@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """One long-lived Tuta session per process.
 
 - Lazy login on first use; credentials are loaded only at login time.

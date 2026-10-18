@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """ASGI guard in front of the MCP Streamable HTTP app.
 
 Order of checks for every HTTP request:

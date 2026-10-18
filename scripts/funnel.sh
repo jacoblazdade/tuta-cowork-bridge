@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Publishes the bridge through Tailscale Funnel (public HTTPS) or removes it.
 # Only the bridge's own route is added/removed; other Serve/Funnel routes are untouched.
 #

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """MCP tool surface. allowed_tools() is the complete set of tools for a configuration
 (read tools + opted-in write groups); build_server() registers exactly that set,
 verify_allowlist() checks it at startup, and the HTTP guard rejects calls to any other

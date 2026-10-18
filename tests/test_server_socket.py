@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Runs the real uvicorn server on a loopback socket with the fake Tuta client."""
 
 import asyncio

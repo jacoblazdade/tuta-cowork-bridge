@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Verifies the public endpoint over the public internet path: resolves the hostname via
 # public DNS (1.1.1.1) and pins curl to that address, so requests go through the HTTPS
 # ingress (e.g. Tailscale Funnel relay) rather than a private/tailnet route.

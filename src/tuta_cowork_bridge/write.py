@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Opt-in mailbox modifications (TCB_WRITE_TOOLS), with server-side guardrails.
 
 Groups:

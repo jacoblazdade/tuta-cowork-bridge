@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 import pytest
 
 from tuta_cowork_bridge.mail import InputError, UNTRUSTED_NOTICE, parse_date

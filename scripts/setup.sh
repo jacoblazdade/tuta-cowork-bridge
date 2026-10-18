@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Interactive setup: dependencies, credentials (Keychain), API key and settings.
 # Secrets are typed into security(1)'s own hidden prompt; they never appear in
 # argv, shell history, files in this repository, or this script's output.

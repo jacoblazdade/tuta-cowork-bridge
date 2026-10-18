@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Shared settings for the helper scripts. Sourced, not executed.
 # All private deployment state lives outside the repository:
 #   config:  $TCB_CONFIG_DIR/bridge.env   (non-secret settings)

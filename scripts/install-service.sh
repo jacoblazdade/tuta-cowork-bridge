@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Installs (or refreshes) the per-user launchd agent that runs the bridge.
 #   scripts/install-service.sh            install + start
 #   scripts/install-service.sh --remove   stop + remove the agent (keeps Keychain items)

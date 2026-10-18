@@ -3,10 +3,11 @@
 Self-hosted MCP bridge connecting **Tuta Mail** to **Claude Cowork** and other remote MCP
 clients — **read-only by default**, with opt-in tools for cleaning up and sending mail.
 
-> **Unofficial.** This project is not affiliated with or endorsed by Tuta GmbH. Tuta has no
-> public API; this bridge relies on the community reverse-engineered client in
-> [tutaproxy](https://github.com/peix2/tutaproxy-public), which can break when Tuta changes its
-> protocol.
+> **Unofficial — use at your own risk.** This project is not affiliated with or endorsed by
+> Tuta GmbH or Anthropic. Tuta has no public API; this bridge relies on the community
+> reverse-engineered client in [tutaproxy](https://github.com/peix2/tutaproxy-public), which can
+> break when Tuta changes its protocol. Using an unofficial client may conflict with Tuta's
+> terms of service — see [Terms of service](#terms-of-service) before connecting your account.
 
 Out of the box Claude can list, search and read your mail, follow threads and draft replies
 **in the conversation**; nothing can be modified. If you opt in (`TCB_WRITE_TOOLS`), Claude can
@@ -192,11 +193,32 @@ that forwards the `X-API-Key` header:
 - Write tools: no inbox rules, no folder deletion, no permanent deletion, no drafts, no
   attachments; `send_email` does not thread replies into the original conversation.
 
+## Terms of service
+
+Read [Tuta's terms](https://tuta.com/terms) yourself; this is not legal advice. Points relevant
+to this project (as of October 2026):
+
+- **Reverse engineering (§ 12):** the licence excludes reverse engineering unless permitted by law
+  or contract. This bridge does not reverse-engineer anything itself, but depends on tutaproxy,
+  which does (Tuta's own clients are open source; EU law permits some reverse engineering for
+  interoperability). Tuta may block service for terms violations (§ 11.1).
+- **Sending limits (§ 7.2–7.4):** no more than 100 emails per hour, no bulk mailings, no mail to
+  recipients without consent. The `send` group defaults to 20 sends/day and your own address only;
+  keep any changes well within these limits.
+
+You are responsible for how you use this software with your account.
+
 ## Acknowledgements and licence
 
 Built on [tutaproxy](https://github.com/peix2/tutaproxy-public) (Tuta API client and crypto) and
 [TutaMCP](https://github.com/peix2/tutamcp-public) (mail decryption helpers) by peix2, both
-AGPL-3.0, used unmodified as pinned git submodules. Neither project's MCP tools are registered.
+AGPL-3.0-or-later, used unmodified as pinned git submodules. Neither project's MCP tools are
+registered. Generic improvements are intended to go upstream.
 
-Licensed under **AGPL-3.0-only** ([LICENSE](LICENSE)). If you run a modified version for others
-over a network, you must offer them its source (set `TCB_SOURCE_URL`).
+Licensed under **AGPL-3.0-or-later** ([LICENSE](LICENSE)), matching upstream. If you run a modified
+version for others over a network, you must offer them its source (set `TCB_SOURCE_URL`). The
+software comes with no warranty (LICENSE §§ 15–16).
+
+*Tuta* and *Tutanota* are trademarks of Tuta GmbH. *Claude* and *Claude Cowork* are trademarks of
+Anthropic PBC. *Tailscale* is a trademark of Tailscale Inc. Names are used only to describe
+compatibility.

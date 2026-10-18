@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Logging with redaction applied to the final formatted line (message + traceback)."""
 
 from __future__ import annotations

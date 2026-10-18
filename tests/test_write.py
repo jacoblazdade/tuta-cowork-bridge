@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Opt-in write tools: behaviour and guardrails."""
 
 import json
@@ -85,9 +86,9 @@ async def test_create_and_rename_folder(reader, tuta, fake):
         await w.create_folder("freelance 2026")  # duplicate
     with pytest.raises(InputError):
         await w.create_folder("bad\nname")
-    assert (await w.rename_folder("Freelance 2026", "Selbständigkeit"))["new_name"] == "Selbständigkeit"
+    assert (await w.rename_folder("Freelance 2026", "Kundenprojekte"))["new_name"] == "Kundenprojekte"
     names = {f["name"] for f in (await reader.list_folders())["folders"]}
-    assert "Selbständigkeit" in names
+    assert "Kundenprojekte" in names
     with pytest.raises(InputError):
         await w.rename_folder("inbox", "x")
 
