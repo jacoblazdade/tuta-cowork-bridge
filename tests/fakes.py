@@ -222,7 +222,6 @@ class FakeTutaClient:
             "1306": [_addr(key, *m.to[0])],
             "1307": str(len(m.to)),
             "1308": [["ARCHIVE01", f"D{m.elem_id}"]],
-            "1022": "0",
             "115": [["FILES0000001", f"{m.elem_id}-{i}"] for i in range(len(m.attachments))],
             "117": [[m.conversation, f"CE{m.elem_id}"]] if m.conversation else [],
         }

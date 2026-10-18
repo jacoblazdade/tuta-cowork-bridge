@@ -141,7 +141,7 @@ def build_server(reader: MailReader, tuta: TutaSession, runner: ToolRunner, sour
     @mcp.tool(annotations=READ_ONLY)
     async def get_email_metadata(email_id: str) -> dict:
         """Headers of one email without its body: from, to/cc/bcc, date, subject, unread,
-        encryption, sender authentication result and attachment names."""
+        whether it was end-to-end encrypted, and attachment names."""
         return await runner("get_email_metadata", reader.get_email_metadata(email_id))
 
     @mcp.tool(annotations=READ_ONLY)

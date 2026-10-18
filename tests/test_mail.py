@@ -82,7 +82,6 @@ async def test_read_email(reader, fake):
     assert mail["from"] == "Bob Sample <bob@sample.net>"
     assert mail["to"] == ["Owner <owner@example.test>"]
     assert mail["attachments"] == [{"name": "agenda.pdf", "mime": "application/pdf"}]
-    assert mail["sender_authentication"] == "authenticated"
     assert "Body 29" in mail["body"] and mail["body_truncated"] is False
     # the mail was fetched once (prefetch reused) and nothing was written
     assert [c for c in fake.calls if c == ("single", first["email_id"].split("/")[1])] == [("single", "M00000000029")]
