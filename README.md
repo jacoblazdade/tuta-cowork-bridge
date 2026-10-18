@@ -56,7 +56,7 @@ Reading an email does **not** mark it as read.
 ## Install (macOS + Tailscale Funnel)
 
 ```bash
-git clone --recurse-submodules https://github.com/<owner>/tuta-cowork-bridge.git
+git clone --recurse-submodules https://github.com/jacoblazdade/tuta-cowork-bridge.git
 cd tuta-cowork-bridge
 scripts/setup.sh            # deps, settings, credentials into the Keychain, API key
 scripts/live-check.sh       # one Tuta login, prints counts only

@@ -10,7 +10,7 @@ import os
 from dataclasses import dataclass
 
 DEFAULT_ORIGINS = ("https://claude.ai", "https://claude.com")
-SOURCE_URL = "https://github.com/tuta-cowork-bridge/tuta-cowork-bridge"
+SOURCE_URL = "https://github.com/jacoblazdade/tuta-cowork-bridge"
 
 
 def _csv(value: str | None) -> tuple[str, ...]:
