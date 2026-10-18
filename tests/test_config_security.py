@@ -44,16 +44,21 @@ async def test_allowlist_matches_registry(reader, tuta):
 
 
 def test_no_upstream_tool_registration_in_source():
-    """The bridge must never call upstream register_* functions or mutating client methods."""
+    """Never: upstream tool registration, permanent deletion, folder deletion, file I/O on
+    attachments, telemetry or shell. Mailbox-modifying client calls only in write.py."""
     forbidden = ["register_mail_tools", "register_calendar_tools", "register_contacts_tools",
-                 "register_drive_tools", "mark_mails_unread", "delete_mails", "simple_move_mails",
-                 "move_mails_to_folder", "apply_labels", "create_draft", "send_draft", "upload_attachment",
-                 "create_folder", "rename_folder", "delete_folder", "load_attachments", "get_file_data",
+                 "register_drive_tools", "delete_mails", "delete_folder", "upload_attachment",
+                 "load_attachments", "get_file_data", "attachment_paths=[", "external_password=",
                  "tuta.telemetry", "subprocess.Popen", "os.system", "eval(", "exec("]
+    write_only = ["mark_mails_unread", "simple_move_mails", "move_mails_to_folder", "apply_labels",
+                  "_send_core", "create_folder(session", "rename_folder(session"]
     for path in SRC.glob("*.py"):
         text = path.read_text()
         for word in forbidden:
             assert word not in text, f"{word} found in {path.name}"
+        if path.name != "write.py":
+            for word in write_only:
+                assert word not in text, f"{word} outside write.py ({path.name})"
 
 
 def test_tool_names_are_read_only():

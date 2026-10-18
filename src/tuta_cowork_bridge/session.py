@@ -83,7 +83,12 @@ class TutaSession:
 
     # -- public -----------------------------------------------------------------
 
-    async def run(self, fn: Callable[[TutaClient, Session, bytes], Awaitable[Any]]) -> Any:
+    async def run(self, fn: Callable[[TutaClient, Session, bytes], Awaitable[Any]],
+                  retry_transient: bool = True) -> Any:
+        """Runs fn with a live session. Expired sessions are always retried (the request was
+        rejected, so nothing happened). Network errors are retried only when retry_transient:
+        pass False for non-idempotent writes such as sending, where the first attempt may
+        have reached Tuta before the connection failed."""
         client, session, mgk, gen = await self._ensure()
         try:
             return await fn(client, session, mgk)
@@ -93,6 +98,8 @@ class TutaSession:
             log.info("Tuta session expired (HTTP %d); logging in again", e.status_code)
             await self._drop(gen, logout=False)
         except TRANSIENT as e:
+            if not retry_transient:
+                raise
             log.warning("transient Tuta error (%s); retrying once", type(e).__name__)
             await asyncio.sleep(1)
         client, session, mgk, _ = await self._ensure()

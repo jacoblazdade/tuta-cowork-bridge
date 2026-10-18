@@ -31,11 +31,12 @@ from .http import Guard  # noqa: E402
 from .logs import register_secret, setup_logging  # noqa: E402
 from .mail import MailReader  # noqa: E402
 from .session import TutaClient, TutaSession  # noqa: E402
-from .tools import ALLOWED_TOOLS, ToolRunner, build_server, verify_allowlist  # noqa: E402
+from .tools import ToolRunner, allowed_tools, build_server, verify_allowlist  # noqa: E402
+from .write import AuditLog, MailWriter  # noqa: E402
 
 
 def build(settings: Settings, store: CredentialStore | None = None,
-          client_factory: Callable = TutaClient) -> tuple:
+          client_factory: Callable = TutaClient, audit: AuditLog | None = None) -> tuple:
     store = store or CredentialStore(settings)
 
     def load_tuta():
@@ -47,13 +48,21 @@ def build(settings: Settings, store: CredentialStore | None = None,
     tuta = TutaSession(load_tuta, client_factory)
     reader = MailReader(tuta)
     runner = ToolRunner(settings.tool_timeout, settings.max_concurrent_tools)
-    mcp = build_server(reader, tuta, runner, settings.source_url)
+    writer = None
+    if settings.write_groups:
+        if not settings.audit_file and audit is None:
+            raise CredentialError("TCB_WRITE_TOOLS needs TCB_AUDIT_FILE (undo and daily limits depend on it)")
+        writer = MailWriter(tuta, reader, audit or AuditLog(settings.audit_file),
+                            daily_write_limit=settings.daily_write_limit,
+                            daily_send_limit=settings.daily_send_limit,
+                            send_allowlist=settings.send_allowlist)
+    mcp = build_server(reader, tuta, runner, settings.source_url, writer, settings.write_groups)
     return mcp, tuta, store
 
 
 def build_http_app(settings: Settings, store: CredentialStore | None = None,
-                   client_factory: Callable = TutaClient) -> tuple:
-    mcp, tuta, store = build(settings, store, client_factory)
+                   client_factory: Callable = TutaClient, audit: AuditLog | None = None) -> tuple:
+    mcp, tuta, store = build(settings, store, client_factory, audit)
     api_key = store.api_key()  # fail fast if missing
     register_secret(api_key)
     security = TransportSecuritySettings(
@@ -69,7 +78,7 @@ def build_http_app(settings: Settings, store: CredentialStore | None = None,
         transport_security=security,
         host=settings.host,
     )
-    app = Guard(inner, api_key=api_key, mcp_path=settings.mcp_path, allowed_tools=ALLOWED_TOOLS,
+    app = Guard(inner, api_key=api_key, mcp_path=settings.mcp_path, allowed_tools=allowed_tools(settings.write_groups),
                 allowed_origins=settings.allowed_origins, max_body=settings.max_body_bytes,
                 rate_per_minute=settings.rate_per_minute)
     return app, mcp, tuta
@@ -89,7 +98,7 @@ def uvicorn_server(settings: Settings, app):
 
 async def _serve(settings: Settings) -> None:
     app, mcp, tuta = build_http_app(settings)
-    await verify_allowlist(mcp)
+    await verify_allowlist(mcp, allowed_tools(settings.write_groups))
     try:
         await uvicorn_server(settings, app).serve()
     finally:
@@ -98,7 +107,7 @@ async def _serve(settings: Settings) -> None:
 
 async def _stdio(settings: Settings) -> None:
     mcp, tuta, _ = build(settings)
-    await verify_allowlist(mcp)
+    await verify_allowlist(mcp, allowed_tools(settings.write_groups))
     try:
         await mcp.run_stdio_async()
     finally:
@@ -124,7 +133,7 @@ async def _check(settings: Settings) -> int:
     store = CredentialStore(settings)
     mcp, _, _ = build(settings, store)
     try:
-        await verify_allowlist(mcp)
+        await verify_allowlist(mcp, allowed_tools(settings.write_groups))
         allowlist_ok = True
     except RuntimeError:
         allowlist_ok = False
@@ -136,7 +145,9 @@ async def _check(settings: Settings) -> int:
         "credential_backend": settings.credential_backend,
         "credentials_present": items,
         "tool_allowlist_ok": allowlist_ok,
-        "tools": sorted(ALLOWED_TOOLS),
+        "write_groups": list(settings.write_groups),
+        "send_allowlist_entries": len(settings.send_allowlist) if "send" in settings.write_groups else 0,
+        "tools": sorted(allowed_tools(settings.write_groups)),
         "upstream": _vendor_pins(),
         "telemetry_env": os.environ.get("TUTAPROXY_TELEMETRY"),
     }

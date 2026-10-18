@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from typing import Any, AsyncIterator
 
@@ -126,9 +126,11 @@ def _clamp(value: int, lo: int, hi: int) -> int:
 
 @dataclass(frozen=True)
 class Folder:
-    folder_id: str  # MailSet.entries list id
+    folder_id: str  # MailSet.entries list id (the public id)
     name: str
     type: str
+    set_id: tuple[str, str] = ("", "")  # MailSet._id, used by move/label services (internal)
+    raw: Any = field(default=None, compare=False, repr=False)  # upstream MailFolder (internal)
 
     def public(self) -> dict[str, str]:
         return {"folder_id": self.folder_id, "name": self.name, "type": self.type}
@@ -330,6 +332,9 @@ class MailReader:
 
     # ---- internals ----
 
+    def invalidate_folders(self) -> None:
+        self._folder_cache = None
+
     async def _folders(self, client, session, mgk) -> list[Folder]:
         cached = self._folder_cache
         now = self._clock()
@@ -343,6 +348,8 @@ class MailReader:
                 folder_id=f.mail_list_id,
                 name=_decrypt_folder_name(f, mgk),
                 type=_FOLDER_TYPE_CLASS.get(f.folder_type, "custom"),
+                set_id=(f.folder_list_id, f.id),
+                raw=f,
             ))
         self._folder_cache = (self._tuta.generation, now, folders)
         return folders

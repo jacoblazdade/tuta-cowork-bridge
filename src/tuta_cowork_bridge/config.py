@@ -7,9 +7,11 @@ from __future__ import annotations
 
 import ipaddress
 import os
+import re
 from dataclasses import dataclass
 
 DEFAULT_ORIGINS = ("https://claude.ai", "https://claude.com")
+WRITE_GROUPS = ("organize", "folders", "send")
 SOURCE_URL = "https://github.com/jacoblazdade/tuta-cowork-bridge"
 
 
@@ -53,6 +55,11 @@ class Settings:
     log_level: str = "INFO"
     source_url: str = SOURCE_URL
     allow_non_loopback: bool = False
+    write_groups: tuple[str, ...] = ()
+    send_allowlist: tuple[str, ...] = ("me",)
+    daily_write_limit: int = 500
+    daily_send_limit: int = 20
+    audit_file: str | None = None
 
     @classmethod
     def from_env(cls, env: dict | None = None) -> "Settings":
@@ -73,6 +80,11 @@ class Settings:
             log_level=e.get("TCB_LOG_LEVEL", "INFO").upper(),
             source_url=e.get("TCB_SOURCE_URL", SOURCE_URL),
             allow_non_loopback=e.get("TCB_ALLOW_NON_LOOPBACK") == "1",
+            write_groups=tuple(g.lower() for g in _csv(e.get("TCB_WRITE_TOOLS"))),
+            send_allowlist=tuple(a.lower() for a in _csv(e.get("TCB_SEND_ALLOWLIST"))) or ("me",),
+            daily_write_limit=_int(e, "TCB_DAILY_WRITE_LIMIT", 500, 1, 100_000),
+            daily_send_limit=_int(e, "TCB_DAILY_SEND_LIMIT", 20, 1, 1000),
+            audit_file=e.get("TCB_AUDIT_FILE") or None,
         )
         s.validate()
         return s
@@ -93,6 +105,12 @@ class Settings:
         for origin in self.allowed_origins:
             if not origin.startswith("https://"):
                 raise ValueError(f"allowed origin must be https: {origin!r}")
+        unknown = set(self.write_groups) - set(WRITE_GROUPS)
+        if unknown:
+            raise ValueError(f"TCB_WRITE_TOOLS: unknown group(s) {sorted(unknown)}; valid: {', '.join(WRITE_GROUPS)}")
+        for entry in self.send_allowlist:
+            if entry not in ("me", "*") and not re.fullmatch(r"(@|[^@\s]+@)[a-z0-9.-]+\.[a-z]{2,}", entry):
+                raise ValueError(f"TCB_SEND_ALLOWLIST entry {entry!r}: use me, *, name@domain or @domain")
         if self.log_level not in ("DEBUG", "INFO", "WARNING", "ERROR"):
             raise ValueError("TCB_LOG_LEVEL must be DEBUG, INFO, WARNING or ERROR")
 
