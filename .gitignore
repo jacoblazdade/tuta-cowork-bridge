@@ -1,0 +1,33 @@
+# Python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Private deployment state - never commit
+*.env
+!.env.example
+*.log
+logs/
+*.plist
+credentials*
+!src/tuta_cowork_bridge/credentials.py
+secrets*
+*.pem
+*.key
+*.p12
+*.sqlite*
+*.db
+.tutaproxy-id
+downloads/
+mail-dumps/
+
+# Local editor/agent state
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json

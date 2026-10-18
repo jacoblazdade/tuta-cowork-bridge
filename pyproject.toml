@@ -1,0 +1,42 @@
+[project]
+name = "tuta-cowork-bridge"
+version = "1.0.0"
+description = "Self-hosted MCP bridge connecting Tuta Mail to Claude Cowork and other remote MCP clients (read-only)"
+license = "AGPL-3.0-only"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "mcp==2.3.0",
+    "uvicorn==0.54.0",
+    "certifi==2026.7.22",
+    # Same pins as vendor/tutaproxy-public/requirements.txt (v1.3.18).
+    "aiohttp==3.13.5",
+    "argon2-cffi==25.1.0",
+    "cryptography==44.0.3",
+    "kyber-py==1.2.0",
+    "lz4==4.4.5",
+]
+
+[project.scripts]
+tuta-cowork-bridge = "tuta_cowork_bridge.main:main"
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "pytest==8.4.2",
+    "pytest-asyncio==1.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tuta_cowork_bridge"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "live: hits the real Tuta account (opt-in: TUTA_LIVE_TESTS=1)",
+    "settings: extra TCB_* settings for the http fixture",
+]

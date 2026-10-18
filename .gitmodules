@@ -1,0 +1,6 @@
+[submodule "vendor/tutaproxy-public"]
+	path = vendor/tutaproxy-public
+	url = https://github.com/peix2/tutaproxy-public.git
+[submodule "vendor/tutamcp-public"]
+	path = vendor/tutamcp-public
+	url = https://github.com/peix2/tutamcp-public.git
