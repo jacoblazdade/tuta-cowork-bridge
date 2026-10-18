@@ -98,3 +98,9 @@ def test_redaction():
     out = redact(line)
     for leak in ("abc.def", "XYZ123", "KEYVALUE", "bob@example.org", "hunter2-super-secret"):
         assert leak not in out
+
+
+def test_config_errors_exit_cleanly():
+    env = dict(os.environ, TCB_HOST="0.0.0.0")
+    r = subprocess.run([sys.executable, "-m", "tuta_cowork_bridge.main", "check"], env=env, capture_output=True, text=True)
+    assert r.returncode == 2 and r.stderr.startswith("configuration error:") and "Traceback" not in r.stderr

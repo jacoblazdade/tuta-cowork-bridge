@@ -151,6 +151,9 @@ stdio (it logs in to Tuta separately).
 | Uninstall the service | `scripts/install-service.sh --remove` |
 | Review write actions | `tail ~/Library/Application\ Support/tuta-cowork-bridge/audit.jsonl` |
 
+To run a second instance on the same machine (e.g. a test checkout), give it its own
+`TCB_LABEL`, `TCB_PORT`, `TCB_CONFIG_DIR` and `TCB_KEYCHAIN_SERVICE`.
+
 Private state lives outside the repository: settings in
 `~/Library/Application Support/tuta-cowork-bridge/bridge.env`, logs in
 `~/Library/Logs/tuta-cowork-bridge/`, the agent in

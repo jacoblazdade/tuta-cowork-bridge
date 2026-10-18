@@ -185,7 +185,11 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--version", action="version", version=__version__)
     args = parser.parse_args(argv)
 
-    settings = Settings.from_env()
+    try:
+        settings = Settings.from_env()
+    except ValueError as e:
+        print(f"configuration error: {e}", file=sys.stderr)
+        sys.exit(2)
     setup_logging(settings.log_level, os.environ.get("TCB_LOG_FILE") or None)
     try:
         if args.command == "serve":
