@@ -23,7 +23,7 @@ tuta-cowork-bridge = "tuta_cowork_bridge.main:main"
 dev = [
     "httpx==0.28.1",
     "pytest==8.4.2",
-    "pytest-asyncio==1.2.0",
+    "pytest-asyncio==1.4.0",
 ]
 
 [build-system]
