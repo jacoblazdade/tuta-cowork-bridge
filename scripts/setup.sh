@@ -68,6 +68,8 @@ settings() {
   host="${entered:-$host}"
   read -r -p "Local port [$TCB_PORT]: " port
   port="${port:-$TCB_PORT}"
+  # Write tools stay as previously configured (default: none = read-only); edit bridge.env to change.
+  local write_tools="${TCB_WRITE_TOOLS:-}" allowlist="${TCB_SEND_ALLOWLIST:-me}"
   umask 077
   cat > "$TCB_ENV_FILE" <<EOF
 # tuta-cowork-bridge settings (non-secret). Secrets live in the Keychain.
@@ -77,6 +79,12 @@ TCB_MCP_PATH=$TCB_MCP_PATH
 TCB_PUBLIC_HOSTS=$host
 TCB_KEYCHAIN_SERVICE=$TCB_KEYCHAIN_SERVICE
 TCB_LOG_LEVEL=INFO
+# Opt-in write tools: any of organize,folders,send (empty = read-only). See README.
+TCB_WRITE_TOOLS=$write_tools
+TCB_SEND_ALLOWLIST=$allowlist
+TCB_DAILY_WRITE_LIMIT=500
+TCB_DAILY_SEND_LIMIT=20
+TCB_AUDIT_FILE=$TCB_CONFIG_DIR/audit.jsonl
 EOF
   echo "wrote $TCB_ENV_FILE"
 }

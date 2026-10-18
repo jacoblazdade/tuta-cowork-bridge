@@ -57,6 +57,10 @@ EOF
 plutil -lint "$PLIST" >/dev/null
 
 launchctl bootout "$DOMAIN/$TCB_LABEL" 2>/dev/null || true
+for _ in $(seq 1 20); do  # bootout is asynchronous; bootstrap fails while the old job lingers
+  launchctl print "$DOMAIN/$TCB_LABEL" >/dev/null 2>&1 || break
+  sleep 0.5
+done
 launchctl bootstrap "$DOMAIN" "$PLIST"
 launchctl enable "$DOMAIN/$TCB_LABEL"
 echo "installed and started $TCB_LABEL"

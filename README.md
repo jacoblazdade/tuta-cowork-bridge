@@ -1,17 +1,19 @@
 # tuta-cowork-bridge
 
 Self-hosted MCP bridge connecting **Tuta Mail** to **Claude Cowork** and other remote MCP
-clients — **read-only**.
+clients — **read-only by default**, with opt-in tools for cleaning up and sending mail.
 
 > **Unofficial.** This project is not affiliated with or endorsed by Tuta GmbH. Tuta has no
 > public API; this bridge relies on the community reverse-engineered client in
 > [tutaproxy](https://github.com/peix2/tutaproxy-public), which can break when Tuta changes its
 > protocol.
 
-Claude can list, search and read your mail, follow threads and draft replies **in the
-conversation**. It cannot send, reply, forward, delete, move, label or mark anything:
-those capabilities do not exist in the server, and calls to them are rejected at the HTTP
-boundary.
+Out of the box Claude can list, search and read your mail, follow threads and draft replies
+**in the conversation**; nothing can be modified. If you opt in (`TCB_WRITE_TOOLS`), Claude can
+also move, trash/restore, mark and label mail, create/rename folders and send mail to an
+allowlist of recipients — see [Write tools](#write-tools-opt-in). Permanent deletion is never
+available. Tools that are not enabled do not exist in the server, and calls to them are
+rejected at the HTTP boundary.
 
 ```
 Claude Cowork (Anthropic cloud)
@@ -39,9 +41,29 @@ threat model.
 | `read_email` | Headers, full recipient lists, attachment names, plain-text body (≤ 50 000 chars) |
 | `get_email_metadata` | Same without the body |
 | `get_thread` | The conversation an email belongs to, optionally with bodies |
-| `connector_status` | Version, read-only flag, Tuta session state |
+| `connector_status` | Version, read-only flag, enabled write groups, Tuta session state |
 
-Reading an email does **not** mark it as read.
+Reading an email does **not** mark it as read. Custom folders and labels work everywhere a
+folder is accepted, by name or `folder_id` (e.g. `search_emails(folder="Freelance", sender="…")`).
+
+### Write tools (opt-in)
+
+Enable groups with `TCB_WRITE_TOOLS` in your private `bridge.env`, then `scripts/install-service.sh`:
+
+| Group | Tools | Notes |
+|---|---|---|
+| `organize` | `move_emails`, `trash_emails`, `restore_emails`, `mark_emails` | "Delete" = Trash. `restore_emails` returns mail to the folder it was trashed from. Move targets: inbox, archive, spam, custom folders. |
+| `folders` | `create_folder`, `rename_folder`, `label_emails` | Custom folders only; no folder deletion. Labels must already exist. |
+| `send` | `send_email` | Plain-text mail from your address. Every recipient must match `TCB_SEND_ALLOWLIST` (default `me` = only yourself; also `name@domain`, `@domain`, or `*`). No BCC, no attachments, max 10 recipients. Sent as a new message (not threaded). |
+
+Server-side guardrails regardless of the client: ≤ 50 emails per call, daily caps
+(`TCB_DAILY_WRITE_LIMIT` modified emails, `TCB_DAILY_SEND_LIMIT` sends), no automatic retry for
+sends, and a private audit log (`TCB_AUDIT_FILE`, JSON lines, ids/actions/recipient domains only —
+never subjects, bodies or addresses) that also powers undo and the caps. Write tools carry
+`readOnlyHint=false` (and `destructiveHint=true` for trash/send) so clients can ask before running
+them. **Inbox rules are not supported** (Tuta's rule storage is not implemented by the client
+library); create rules in the Tuta app — Claude can propose them and sort existing mail with
+`move_emails`.
 
 ## Requirements
 
@@ -126,6 +148,7 @@ stdio (it logs in to Tuta separately).
 | Re-enter Tuta credentials | `scripts/setup.sh --credentials && scripts/restart.sh` |
 | Tests (synthetic data only) | `scripts/test.sh` |
 | Uninstall the service | `scripts/install-service.sh --remove` |
+| Review write actions | `tail ~/Library/Application\ Support/tuta-cowork-bridge/audit.jsonl` |
 
 Private state lives outside the repository: settings in
 `~/Library/Application Support/tuta-cowork-bridge/bridge.env`, logs in
@@ -166,6 +189,8 @@ that forwards the `X-API-Key` header:
   requirement.
 - `kill -9`/power loss skips the Tuta logout; that session expires server-side.
 - One Tuta session per bridge process; the API key is read at startup (restart after rotation).
+- Write tools: no inbox rules, no folder deletion, no permanent deletion, no drafts, no
+  attachments; `send_email` does not thread replies into the original conversation.
 
 ## Acknowledgements and licence
 

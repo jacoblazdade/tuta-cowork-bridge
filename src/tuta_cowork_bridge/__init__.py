@@ -1,3 +1,3 @@
-"""tuta-cowork-bridge: read-only Tuta Mail MCP bridge (unofficial)."""
+"""tuta-cowork-bridge: Tuta Mail MCP bridge, read-only by default (unofficial)."""
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"

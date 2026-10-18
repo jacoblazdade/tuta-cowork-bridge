@@ -1,24 +1,26 @@
 # Roadmap
 
-Version 1 is deliberately read-only. Any capability below changes the risk profile and must be
-added explicitly — never enabled by upgrading dependencies (the tool allowlist lives in this
-repository, not upstream).
+Read-only is the default. Version 1.1 added opt-in write groups (`organize`, `folders`, `send`)
+following the rules below. Every capability changes the risk profile and must be enabled
+explicitly — never by upgrading dependencies (the tool allowlist lives in this repository).
 
 Ground rules for every write capability:
 
-- Off by default; enabled by a named setting (e.g. `TCB_ENABLE_DRAFTS=1`) **and** listed in a
-  separate allowlist, so the read-only deployment stays the default.
-- Separate API key (or OAuth scope) from the read-only key, so a read-only client can never
-  escalate.
+- Off by default; enabled by a named group in `TCB_WRITE_TOOLS` **and** listed in the tool
+  allowlist, so the read-only deployment stays the default.
+- Server-side limits that hold regardless of the client (batch size, daily caps, allowlists).
 - Tool annotations (`destructiveHint`, `readOnlyHint=false`) set correctly so clients ask the user.
 - Audit log entry (tool, target ids, outcome — never content).
 - Tests proving the feature is unreachable when disabled.
 
 | Feature | What is needed |
 |---|---|
+| ~~Move / trash / restore / mark / labels / create & rename folders~~ | Done in 1.1 (`organize`, `folders`). |
+| ~~Send~~ | Done in 1.1 (`send`) with a recipient allowlist, daily cap and no retry. Next: optional out-of-band confirmation. |
+| Inbox rules | Not implemented upstream: requires reverse-engineering Tuta's encrypted rule storage (TutanotaProperties); a bug could break existing rules. |
 | Save drafts to Tuta | `TutaClient.create_draft` exists upstream. Add a `save_draft` tool that only creates drafts (no send path), recipients limited to the original thread for replies. Lowest-risk write; good first step. |
-| Reply / send | Two-step design: tool returns a draft id; sending requires a separate confirmation that cannot be issued by the same model turn (e.g. a one-time code shown to the user out of band). Recipient allowlist option. Never autonomous. |
-| Delete / move / mark read | Separate key + confirmation; prefer move-to-trash over permanent delete; never bulk by default. |
+| Out-of-band send confirmation | Sending requires a confirmation the model cannot issue itself (e.g. a code shown on another device), so the allowlist could be relaxed safely. |
+| Separate write key / OAuth scopes | A second API key (or OAuth scopes) for write tools, so read-only clients can never escalate. |
 | Body full-text search | Optional local index in an encrypted store (key in Keychain), explicit opt-in, documented retention and rebuild; or bounded on-demand scans as today. |
 | Attachments | Return small text attachments inline with size/type limits; never write to disk; treat as untrusted (parsers are an attack surface). |
 | Calendar / contacts | Read-only first, using existing upstream read helpers; same allowlist pattern. |
